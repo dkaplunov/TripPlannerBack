@@ -13,7 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Optional;
+
 
 @Log
 @RestController
@@ -32,20 +32,14 @@ public class AutentificationController {
     @RequestMapping(value="/login", method=RequestMethod.POST)
     public ResponseEntity<?> login(HttpServletRequest request, @RequestBody Users user) { //@RequestParam Optional<String> username, @RequestParam Optional<String> password
 
-        String username = request.getParameter("username");
-        String password = request.getParameter("password");
-        String body = request.getParameter("body");
-
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        username,
-                        password
+                        user.getUserName(),
+                        user.getPassword()
                 )
         );
 
-        //SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        return ResponseEntity.ok(jwtHelper.createToken(userService.findUserByName(username).getId()));
+        return ResponseEntity.ok(jwtHelper.createToken(userService.findUserByName(user.getUserName()).getId()));
     }
 
     @ExceptionHandler(Exception.class)
