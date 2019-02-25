@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import {req} from "./requestHandler"
 import styled from "styled-components"
+import {ACCESS_TOKEN} from "./constants";
 
 export class LoginForm extends Component {
     constructor(props) {
@@ -8,6 +9,7 @@ export class LoginForm extends Component {
         this.state = {
             userName: null,
             password: null,
+            authenticated: false
         }
         this.loginHandler=this.loginHandler.bind(this);
         this.changeHandler=this.changeHandler.bind(this);
@@ -15,7 +17,15 @@ export class LoginForm extends Component {
 
 
     loginHandler (event) {
-        req("api/login", this.state)
+        req("api/login", this.state, (data)=>{
+            this.setState({authenticated: true});
+            localStorage.setItem(ACCESS_TOKEN, data);
+        })
+    }
+
+    logoutHandler (me) {
+        me.setState({authenticated: false});
+        localStorage.setItem(ACCESS_TOKEN, null);
     }
 
     changeHandler (event) {
@@ -29,12 +39,26 @@ export class LoginForm extends Component {
         this.setState(stateObj);
     }
 
+    showLoginForm () {
+        return this.state.authenticated?'none':'block'
+    }
+
+    showLogoutForm (me) {
+        return !this.state.authenticated?'none':'block'
+    }
+
     render () {
+        var me = this;
         return (
             <form method="POST">
-                <input name="userName" onChange={this.changeHandler}/><br/>
-                <input name="password" onChange={this.changeHandler}/><br/>
-                <input type="button" value="Ok" onClick={this.loginHandler}/>
+                <div style={{display:this.showLoginForm()}}>
+                    <input name="userName" onChange={this.changeHandler}/><br/>
+                    <input name="password" onChange={this.changeHandler}/><br/>
+                    <input type="button" value="Ok" onClick={this.loginHandler}/>
+                </div>
+                <div style={{display:this.showLogoutForm()}}>
+                    <input type="button" value="Logout" onClick={(event) => {this.logoutHandler(me)}}/>
+                </div>
             </form>
         )
     }

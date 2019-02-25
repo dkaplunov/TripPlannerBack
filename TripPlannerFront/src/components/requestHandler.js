@@ -1,6 +1,6 @@
 import {ACCESS_TOKEN,SERVER_URL} from "./constants"
 
-export const req = (url, data) => {
+export const req = (url, data, funOk) => {
     const headers = new Headers({
         'Content-Type': 'application/json',
     });
@@ -19,11 +19,13 @@ export const req = (url, data) => {
     let object = fetch('http://localhost:8080/'+url, requestObject);
         object.then(response => {   //SERVER_URL
         if (response.ok) {
-            return response.json();
+            return response.text();
         } else {
             if (response.status===403) {
                 return Promise.reject("false");
             }
         }
-    });
+    }).then((text) => {
+            if (funOk) funOk(text);
+        });
 };
