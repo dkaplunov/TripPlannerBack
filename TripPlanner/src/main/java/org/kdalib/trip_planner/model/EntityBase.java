@@ -20,4 +20,9 @@ public class EntityBase {
     @Column(name="delete_date")
     private ZonedDateTime deleteDate;
 
+    @PrePersist
+    public void setCreateDate () {
+        this.createDate = ZonedDateTime.now();
+    }
+
 }
